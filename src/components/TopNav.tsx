@@ -35,7 +35,15 @@ export default function TopNav() {
         {/* Right actions */}
         <div className="nav-actions">
           <button className="nav-signin">Log in</button>
-          <button className="nav-signup">Sign up</button>
+          <button
+            className="nav-request-access"
+            onClick={() => {
+              const el = document.getElementById("cta-section")
+              el ? el.scrollIntoView({ behavior: "smooth" }) : window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+            }}
+          >
+            Request Access
+          </button>
           <button
             className="nav-menu"
             onClick={() => setMenuOpen(o => !o)}

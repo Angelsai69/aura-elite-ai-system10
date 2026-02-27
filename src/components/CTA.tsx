@@ -179,7 +179,7 @@ export default function CTA() {
 
   return (
     <>
-      <section className="section" style={{ textAlign: "center" }}>
+      <section id="cta-section" className="section" style={{ textAlign: "center" }}>
         <div className="bg-layer">
           <div className="grid-overlay" />
           <div className="noise-overlay" />

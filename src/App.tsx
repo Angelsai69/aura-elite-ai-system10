@@ -9,14 +9,13 @@ import LogoStrip from "./components/LogoStrip"
 import Integrations from "./components/Integrations"
 import Features from "./components/Features"
 import Testimonials from "./components/Testimonials"
-import DashboardPreview from "./components/DashboardPreview"
-import Demo from "./components/Demo"
+import LivePlatform from "./components/LivePlatform"
 import CTA from "./components/CTA"
 import Footer from "./components/Footer"
 import AIChat from "./components/AIChat"
 import { useScrollEffects } from "./hooks/useScrollEffects"
 
-const SECTION_COUNT = 9
+const SECTION_COUNT = 8
 
 function ScrollBlurOverlay() {
   const { sectionBlur } = useScrollEffects(SECTION_COUNT)
@@ -49,9 +48,8 @@ export default function App() {
             {/* 4 */ }<LogoStrip />
             {/* 5 */ }<Integrations />
             {/* 6 */ }<Testimonials />
-            {/* 7 */ }<DashboardPreview />
-            {/* 8 */ }<Demo />
-            {/* 9 */ }<CTA />
+            {/* 7 */ }<LivePlatform />
+            {/* 8 */ }<CTA />
           </main>
           <Footer />
           <AIChat />
