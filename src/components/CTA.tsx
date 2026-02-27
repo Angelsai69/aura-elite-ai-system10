@@ -214,7 +214,7 @@ export default function CTA() {
 
           <p style={{ fontFamily: "var(--font)", fontWeight: "var(--w-regular)" as any, color: "var(--text-muted)", fontSize: "0.85rem", lineHeight: 1.85, marginBottom: "2.75rem" }}>
             Join 2,400+ teams already on the waitlist.<br />
-            Early access launching Q1 2025.
+            Early access launching Q1 2026.
           </p>
 
           <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>

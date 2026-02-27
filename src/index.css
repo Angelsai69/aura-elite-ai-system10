@@ -49,7 +49,24 @@ body:has(button:hover) .cursor-ring, body:has(a:hover) .cursor-ring { width: 56p
 
 /* ─── LOADER ─── */
 .loader { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
-.loader-logo { font-family: var(--font); font-weight: var(--w-heavy); font-size: 3rem; letter-spacing: -0.05em; background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.loader-logo {
+  font-family: var(--font);
+  font-weight: var(--w-heavy);
+  font-size: 3rem;
+  letter-spacing: -0.04em;
+  /* Padding ensures gradient clip includes descenders and leg bottoms */
+  padding: 0.08em 0.12em;
+  line-height: 1.1;
+  /* overflow:visible so clip-path animation doesn't cut letter legs */
+  overflow: visible;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  /* clip-path is set by framer-motion — needs a block display */
+  display: inline-block;
+}
 .loader-bar { width: 120px; height: 1px; background: var(--border); overflow: hidden; }
 .loader-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent3)); }
 .loader-tagline { font-family: var(--font); font-weight: var(--w-regular); font-size: 0.65rem; letter-spacing: 0.25em; color: var(--text-dim); text-transform: uppercase; }
@@ -393,4 +410,303 @@ body:has(button:hover) .cursor-ring, body:has(a:hover) .cursor-ring { width: 56p
   .form-row-2 { grid-template-columns:1fr; }
   .footer-row { flex-direction:column; align-items:flex-start; gap:0.75rem; }
   .nav-links { display:none; }
+}
+
+/* ─── PLATFORM SECTION ─────────────────────────────── */
+.platform-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 7rem 2rem 5rem;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Atmospheric orbs unique to this section */
+.platform-orb-left {
+  position: absolute;
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(110,90,255,0.1) 0%, transparent 70%);
+  top: 10%; left: -10%;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(60px);
+}
+.platform-orb-right {
+  position: absolute;
+  width: 500px; height: 350px;
+  background: radial-gradient(ellipse, rgba(56,189,248,0.07) 0%, transparent 70%);
+  top: 20%; right: -8%;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(60px);
+}
+
+/* Header text */
+.platform-header {
+  text-align: center;
+  max-width: 640px;
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 2;
+}
+
+.platform-title {
+  font-family: var(--font);
+  font-weight: var(--w-bold);
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 1.25rem;
+}
+
+.platform-title-grad {
+  background: linear-gradient(90deg, var(--accent2), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.platform-sub {
+  font-family: var(--font);
+  font-weight: var(--w-regular);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* Stage — contains glow + image */
+.platform-stage {
+  position: relative;
+  width: 100%;
+  max-width: 1060px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+/* Bloom glow underneath the devices */
+.platform-glow {
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85%;
+  height: 260px;
+  background: radial-gradient(
+    ellipse 80% 100% at 50% 100%,
+    rgba(110,90,255,0.22) 0%,
+    rgba(56,189,248,0.1) 40%,
+    transparent 70%
+  );
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+}
+
+/* Device image wrapper */
+.platform-device-wrap {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  transform-origin: center bottom;
+  /* Slight persistent tilt — motion overrides this dynamically */
+  will-change: transform;
+}
+
+.platform-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  /* Crisp rendering — no browser smoothing artifacts */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  /* Subtle border to lift it from the dark bg */
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 40px 120px rgba(0,0,0,0.7),
+    0 0 80px rgba(110,90,255,0.12);
+}
+
+/* Bottom fade so image bleeds into background gracefully */
+.platform-img-fade {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 28%;
+  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+  border-radius: 0 0 12px 12px;
+  pointer-events: none;
+}
+
+/* Stats row */
+.platform-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-top: 4rem;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 680px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.platform-stat {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+
+.platform-stat:last-child { border-right: none; }
+
+.platform-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.15;
+}
+
+.platform-stat-value {
+  font-family: var(--font);
+  font-weight: var(--w-heavy);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 0.45rem;
+}
+
+.platform-stat-label {
+  font-family: var(--font);
+  font-weight: var(--w-regular);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 768px) {
+  .platform-stats { flex-direction: column; }
+  .platform-stat { border-right: none; border-bottom: 1px solid var(--border); }
+  .platform-stat:last-child { border-bottom: none; }
+}
+
+/* ─── INTEGRATIONS ORBIT SECTION ───────────────────── */
+.integrations-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 7rem 2rem 6rem;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.integrations-header {
+  text-align: center;
+  max-width: 600px;
+  margin-bottom: 3.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.integrations-sub {
+  font-family: var(--font);
+  font-weight: var(--w-regular);
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.78;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Orbit diagram container */
+.orbit-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.orbit-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Floating stat callouts beside the orbit */
+.orbit-callout {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+}
+
+.orbit-callout-left  { right: calc(100% + 12px); }
+.orbit-callout-right { left:  calc(100% + 12px); }
+
+.orbit-callout-value {
+  font-family: var(--font);
+  font-weight: var(--w-heavy);
+  font-size: 1.4rem;
+  letter-spacing: -0.04em;
+  background: linear-gradient(90deg, var(--accent2), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.orbit-callout-label {
+  font-family: var(--font);
+  font-weight: var(--w-regular);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+
+/* Bottom tagline */
+.integrations-tagline {
+  font-family: var(--font);
+  font-weight: var(--w-bold);
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  color: var(--text-muted);
+  margin-top: 3.5rem;
+  letter-spacing: -0.02em;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.integrations-tagline span {
+  background: linear-gradient(90deg, var(--accent2), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
+  .orbit-callout { display: none; }
+  .orbit-wrap { max-width: 340px; }
 }

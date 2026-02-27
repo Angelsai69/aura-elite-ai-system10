@@ -47,15 +47,7 @@ export default function Hero() {
   }, [mouseX, mouseY, motion_])
 
   return (
-    /*
-      KEY FIX: This element uses .hero-section class — NOT .section.
-      .section has overflow:hidden which clips the large AIZA title legs.
-      .hero-section sets its own overflow:visible while keeping orbs
-      contained in a separate .hero-bg child that has overflow:hidden.
-    */
     <div className="hero-section" ref={sectionRef}>
-
-      {/* Orbs/background — overflow:hidden here only, never on the title parent */}
       <div className="hero-bg">
         <div className="deep-sphere deep-sphere-hero" />
         <motion.div className="orb orb-1" style={motion_.parallax ? { x: springX, y: springY } : {}} />
@@ -65,24 +57,21 @@ export default function Hero() {
         <div className="noise-overlay" />
       </div>
 
-      {/* Centred content */}
-      <motion.div
-        className="hero-content"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-        <motion.div className="hero-eyebrow"
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.6 }}>
+      <div className="hero-content">
+        <motion.div
+          className="hero-eyebrow"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
           AI Automation Platform
         </motion.div>
 
         <motion.h1
           className="hero-title"
-          initial={{ opacity: 0, y: 40, filter: motion_.blur ? "blur(14px)" : "none" }}
+          initial={{ opacity: 0, y: 32, filter: "blur(12px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ delay: 0.2, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.2, duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
         >
           AIZA
         </motion.h1>
@@ -90,17 +79,20 @@ export default function Hero() {
         <motion.div
           key={morphIdx}
           className="hero-morph"
-          initial={{ opacity: 0, y: 10, filter: motion_.blur ? "blur(8px)" : "none" }}
+          initial={{ opacity: 0, y: 8, filter: "blur(6px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.55 }}
+          exit={{ opacity: 0, y: -8, filter: "blur(6px)" }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
           {MORPH_WORDS[morphIdx]}
         </motion.div>
 
-        <motion.p className="hero-sub"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.8 }}>
+        <motion.p
+          className="hero-sub"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.9 }}
+        >
           <span style={{ color: "var(--accent2)" }}>&gt; </span>
           {typed}
           <span className="typing-cursor" />
@@ -108,14 +100,14 @@ export default function Hero() {
 
         <motion.button
           className="hero-cta"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.6 }}
-          onClick={() => document.documentElement.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
+          transition={{ delay: 0.7, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
         >
           Explore the Platform <span>→</span>
         </motion.button>
-      </motion.div>
+      </div>
 
       <div className="hero-scroll-hint">
         <span>Scroll</span>
