@@ -104,7 +104,7 @@ export default function LivePlatform() {
             const p = Math.min((now - t0) / dur, 1)
             setProgress(p * 100)
             if (p < 1) requestAnimationFrame(raf)
-            else { step++; if (step < STEPS.length) setTimeout(runStep, 300) else setActiveStep(STEPS.length) }
+            else { step++; if (step < STEPS.length) { setTimeout(runStep, 300) } else { setActiveStep(STEPS.length) } }
           }
           requestAnimationFrame(raf)
         }
