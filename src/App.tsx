@@ -44,10 +44,10 @@ export default function App() {
           <ScrollProgress sectionCount={SECTION_COUNT} />
           <main>
             {/* 1 */ }<Hero />
-            {/* 2 */ }<Platform />
-            {/* 3 */ }<LogoStrip />
-            {/* 4 */ }<Integrations />
-            {/* 5 */ }<Features />
+            {/* 2 */ }<Features />
+            {/* 3 */ }<Platform />
+            {/* 4 */ }<LogoStrip />
+            {/* 5 */ }<Integrations />
             {/* 6 */ }<Testimonials />
             {/* 7 */ }<DashboardPreview />
             {/* 8 */ }<Demo />

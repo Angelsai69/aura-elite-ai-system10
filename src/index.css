@@ -637,7 +637,7 @@ body:has(button:hover) .cursor-ring, body:has(a:hover) .cursor-ring { width: 56p
 .orbit-wrap {
   position: relative;
   width: 100%;
-  max-width: 560px;
+  max-width: 620px;
   display: flex;
   align-items: center;
   justify-content: center;

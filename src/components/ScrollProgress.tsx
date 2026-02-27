@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-const LABELS = ["Hero", "Platform", "Stack", "Connect", "Features", "Proof", "Dashboard", "Demo", "Launch"]
+const LABELS = ["Hero", "Pain", "Platform", "Stack", "Connect", "Proof", "Dashboard", "Demo", "Launch"]
 
 export default function ScrollProgress({ sectionCount = 7 }: { sectionCount?: number }) {
   const [active, setActive] = useState(0)

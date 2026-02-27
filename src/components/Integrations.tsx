@@ -1,7 +1,6 @@
 import { motion } from "framer-motion"
 import { useEffect, useRef, useState } from "react"
 
-// Each integration: name, angle on the orbit, accent color for its pulse
 const INTEGRATIONS = [
   { name: "Salesforce",  angle:   0, color: "#00a1e0", abbr: "SF" },
   { name: "OpenAI",      angle:  40, color: "#74aa9c", abbr: "AI" },
@@ -14,44 +13,75 @@ const INTEGRATIONS = [
   { name: "Claude",      angle: 320, color: "#a78bfa", abbr: "CL" },
 ]
 
-const ORBIT_R = 180   // px — orbit radius (SVG units, viewBox 500x500, center 250,250)
-const CX = 250
-const CY = 250
+// Bigger orbit to give enlarged logos breathing room
+const ORBIT_R = 195
+const CX = 260
+const CY = 260
 
-// Convert polar to cartesian
 function polar(cx: number, cy: number, r: number, angleDeg: number) {
   const rad = (angleDeg - 90) * (Math.PI / 180)
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }
 }
 
-// A single animated pulse travelling along a straight line
+// Animated pulse — fatter, brighter, longer trail
 function Pulse({
   x1, y1, x2, y2, color, delay, inbound,
 }: {
   x1: number; y1: number; x2: number; y2: number
   color: string; delay: number; inbound: boolean
 }) {
+  const sx = inbound ? x1 : x2
+  const sy = inbound ? y1 : y2
+  const ex = inbound ? x2 : x1
+  const ey = inbound ? y2 : y1
+
   return (
-    <motion.circle
-      r={3.5}
-      fill={color}
-      filter={`drop-shadow(0 0 4px ${color})`}
-      initial={{ offsetDistance: "0%", opacity: 0 }}
-      animate={{
-        offsetDistance: ["0%", "100%"],
-        opacity: [0, 1, 1, 0],
-      }}
-      transition={{
-        duration: 1.6,
-        delay,
-        repeat: Infinity,
-        repeatDelay: 3.5 + Math.random() * 2,
-        ease: "easeInOut",
-      }}
-      style={{
-        offsetPath: `path('M ${inbound ? x2 : x1} ${inbound ? y2 : y1} L ${inbound ? x1 : x2} ${inbound ? y1 : y2}')`,
-      } as React.CSSProperties}
-    />
+    <>
+      {/* Leading bright dot */}
+      <motion.circle
+        r={4.5}
+        fill={color}
+        style={{
+          offsetPath: `path('M ${sx} ${sy} L ${ex} ${ey}')`,
+          filter: `drop-shadow(0 0 6px ${color}) drop-shadow(0 0 12px ${color})`,
+        } as React.CSSProperties}
+        initial={{ offsetDistance: "0%", opacity: 0 }}
+        animate={{
+          offsetDistance: ["0%", "100%"],
+          opacity: [0, 1, 1, 0.2],
+        }}
+        transition={{
+          duration: 1.4,
+          delay,
+          repeat: Infinity,
+          repeatDelay: 2.8 + Math.random() * 1.5,
+          ease: "easeIn",
+        }}
+      />
+      {/* Trailing glow smear — slightly behind, larger, more diffuse */}
+      <motion.circle
+        r={7}
+        fill={color}
+        opacity={0}
+        style={{
+          offsetPath: `path('M ${sx} ${sy} L ${ex} ${ey}')`,
+          filter: `blur(4px) drop-shadow(0 0 10px ${color})`,
+          mixBlendMode: "screen",
+        } as React.CSSProperties}
+        initial={{ offsetDistance: "0%" }}
+        animate={{
+          offsetDistance: ["0%", "90%"],
+          opacity: [0, 0.55, 0.55, 0],
+        }}
+        transition={{
+          duration: 1.4,
+          delay: delay + 0.06,
+          repeat: Infinity,
+          repeatDelay: 2.8 + Math.random() * 1.5,
+          ease: "easeIn",
+        }}
+      />
+    </>
   )
 }
 
@@ -62,7 +92,7 @@ export default function Integrations() {
   useEffect(() => {
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) setInView(true) },
-      { threshold: 0.3 }
+      { threshold: 0.25 }
     )
     if (ref.current) obs.observe(ref.current)
     return () => obs.disconnect()
@@ -75,7 +105,6 @@ export default function Integrations() {
         <div className="noise-overlay" />
       </div>
 
-      {/* Header */}
       <motion.div
         className="integrations-header"
         initial={{ opacity: 0, y: 24 }}
@@ -94,7 +123,6 @@ export default function Integrations() {
         </p>
       </motion.div>
 
-      {/* Orbit diagram */}
       <motion.div
         className="orbit-wrap"
         initial={{ opacity: 0, scale: 0.92 }}
@@ -102,103 +130,105 @@ export default function Integrations() {
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
       >
-        <svg
-          viewBox="0 0 500 500"
-          className="orbit-svg"
-          aria-hidden="true"
-        >
+        <svg viewBox="0 0 520 520" className="orbit-svg" aria-hidden="true">
           <defs>
-            {/* Radial glow behind center */}
             <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#6e5aff" stopOpacity="0.35" />
+              <stop offset="0%"   stopColor="#6e5aff" stopOpacity="0.4" />
               <stop offset="100%" stopColor="#6e5aff" stopOpacity="0" />
             </radialGradient>
-            {/* Orbit ring gradient — fades at top/bottom */}
-            <linearGradient id="orbitGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="rgba(110,90,255,0.15)" />
-              <stop offset="50%" stopColor="rgba(110,90,255,0.08)" />
-              <stop offset="100%" stopColor="rgba(110,90,255,0.15)" />
-            </linearGradient>
+            {/* Per-logo glow gradients */}
+            {INTEGRATIONS.map(itg => (
+              <radialGradient key={`rg-${itg.name}`} id={`lg-${itg.name}`} cx="50%" cy="50%" r="50%">
+                <stop offset="0%"   stopColor={itg.color} stopOpacity="0.2" />
+                <stop offset="100%" stopColor={itg.color} stopOpacity="0" />
+              </radialGradient>
+            ))}
           </defs>
 
-          {/* Center glow bloom */}
-          <circle cx={CX} cy={CY} r={90} fill="url(#centerGlow)" />
+          {/* Center glow */}
+          <circle cx={CX} cy={CY} r={100} fill="url(#centerGlow)" />
 
-          {/* Orbit ring */}
+          {/* Orbit ring — slightly brighter dashes */}
           <circle
             cx={CX} cy={CY} r={ORBIT_R}
             fill="none"
-            stroke="url(#orbitGrad)"
-            strokeWidth={1}
-            strokeDasharray="4 6"
+            stroke="rgba(110,90,255,0.2)"
+            strokeWidth={1.5}
+            strokeDasharray="5 7"
           />
 
-          {/* Connection lines + pulses per integration */}
+          {/* Lines + pulses */}
           {INTEGRATIONS.map((itg, i) => {
-            const pos = polar(CX, CY, ORBIT_R, itg.angle)
-            // Line ends just outside center node (r=48) and inside logo bubble (r=26)
-            const inner = polar(CX, CY, 52, itg.angle)
-            const outer = polar(CX, CY, ORBIT_R - 28, itg.angle)
+            const pos   = polar(CX, CY, ORBIT_R, itg.angle)
+            const inner = polar(CX, CY, 58, itg.angle)       // just outside center node
+            const outer = polar(CX, CY, ORBIT_R - 34, itg.angle) // just inside logo bubble
 
             return (
               <g key={itg.name}>
-                {/* Static dashed line */}
+                {/* Connection line — brighter base */}
                 <line
                   x1={inner.x} y1={inner.y}
                   x2={outer.x} y2={outer.y}
                   stroke={itg.color}
-                  strokeWidth={1}
-                  strokeOpacity={0.22}
+                  strokeWidth={1.2}
+                  strokeOpacity={0.35}
                   strokeDasharray="3 5"
                 />
-                {/* Inbound pulse (integration → AIZA) */}
+
+                {/* Inbound pulse */}
                 {inView && (
                   <Pulse
                     x1={outer.x} y1={outer.y}
                     x2={inner.x} y2={inner.y}
                     color={itg.color}
-                    delay={i * 0.55}
+                    delay={i * 0.5}
                     inbound
                   />
                 )}
-                {/* Outbound pulse (AIZA → integration) — offset timing */}
+                {/* Outbound pulse — AIZA purple */}
                 {inView && (
                   <Pulse
                     x1={inner.x} y1={inner.y}
                     x2={outer.x} y2={outer.y}
-                    color="#a78bfa"
-                    delay={i * 0.55 + 1.8}
+                    color="#c4b5fd"
+                    delay={i * 0.5 + 1.6}
                     inbound={false}
                   />
                 )}
 
-                {/* Logo bubble */}
+                {/* Logo bubble — 35% bigger: r=26 → r=35 */}
                 <circle
-                  cx={pos.x} cy={pos.y} r={26}
-                  fill="rgba(13,11,28,0.92)"
-                  stroke={itg.color}
-                  strokeWidth={1}
-                  strokeOpacity={0.4}
+                  cx={pos.x} cy={pos.y} r={35}
+                  fill={`url(#lg-${itg.name})`}
                 />
-                {/* Subtle glow ring on hover handled by CSS */}
+                <circle
+                  cx={pos.x} cy={pos.y} r={35}
+                  fill="rgba(10,8,24,0.94)"
+                  stroke={itg.color}
+                  strokeWidth={1.4}
+                  strokeOpacity={0.55}
+                />
+
+                {/* Abbr text — bigger */}
                 <text
-                  x={pos.x} y={pos.y - 5}
+                  x={pos.x} y={pos.y - 7}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill={itg.color}
-                  fontSize="8"
+                  fontSize="11"
                   fontWeight="700"
                   fontFamily="JetBrains Mono, monospace"
-                  opacity="0.9"
                 >
                   {itg.abbr}
                 </text>
+                {/* Name text — bigger */}
                 <text
-                  x={pos.x} y={pos.y + 8}
+                  x={pos.x} y={pos.y + 9}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  fill="rgba(237,237,255,0.45)"
-                  fontSize="6.5"
+                  fill="rgba(237,237,255,0.65)"
+                  fontSize="8.5"
+                  fontWeight="500"
                   fontFamily="DM Sans, sans-serif"
                 >
                   {itg.name}
@@ -207,61 +237,59 @@ export default function Integrations() {
             )
           })}
 
-          {/* Center AIZA node */}
-          <circle cx={CX} cy={CY} r={50} fill="rgba(8,6,18,0.95)" stroke="rgba(110,90,255,0.5)" strokeWidth={1.5} />
-          <circle cx={CX} cy={CY} r={50} fill="none" stroke="rgba(110,90,255,0.15)" strokeWidth={8} />
-
-          {/* Center pulsing ring */}
+          {/* Pulsing rings from center */}
           {inView && (
             <motion.circle
-              cx={CX} cy={CY} r={55}
-              fill="none"
-              stroke="rgba(110,90,255,0.35)"
-              strokeWidth={1}
-              initial={{ r: 52, opacity: 0.6 }}
-              animate={{ r: 72, opacity: 0 }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut" }}
+              cx={CX} cy={CY} r={60}
+              fill="none" stroke="rgba(110,90,255,0.5)" strokeWidth={1.5}
+              initial={{ r: 58, opacity: 0.7 }}
+              animate={{ r: 85, opacity: 0 }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut" }}
             />
           )}
           {inView && (
             <motion.circle
-              cx={CX} cy={CY} r={55}
-              fill="none"
-              stroke="rgba(56,189,248,0.25)"
-              strokeWidth={1}
-              initial={{ r: 52, opacity: 0.5 }}
-              animate={{ r: 72, opacity: 0 }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut", delay: 1.25 }}
+              cx={CX} cy={CY} r={60}
+              fill="none" stroke="rgba(56,189,248,0.35)" strokeWidth={1.5}
+              initial={{ r: 58, opacity: 0.6 }}
+              animate={{ r: 85, opacity: 0 }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut", delay: 1.1 }}
             />
           )}
 
-          {/* AIZA logotype in center */}
+          {/* Center node */}
+          <circle cx={CX} cy={CY} r={54}
+            fill="rgba(6,4,16,0.97)"
+            stroke="rgba(110,90,255,0.6)"
+            strokeWidth={1.8}
+          />
+          <circle cx={CX} cy={CY} r={54}
+            fill="none"
+            stroke="rgba(110,90,255,0.12)"
+            strokeWidth={10}
+          />
+
+          {/* AIZA center text */}
           <text
-            x={CX} y={CY - 7}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="white"
-            fontSize="16"
-            fontWeight="900"
+            x={CX} y={CY - 9}
+            textAnchor="middle" dominantBaseline="middle"
+            fill="white" fontSize="19" fontWeight="900"
             fontFamily="Helvetica Neue, Arial, sans-serif"
             letterSpacing="-1"
           >
             AIZA
           </text>
           <text
-            x={CX} y={CY + 12}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="rgba(167,139,250,0.7)"
-            fontSize="7"
-            fontFamily="DM Sans, sans-serif"
-            letterSpacing="1.5"
+            x={CX} y={CY + 13}
+            textAnchor="middle" dominantBaseline="middle"
+            fill="rgba(167,139,250,0.75)"
+            fontSize="7.5" fontFamily="DM Sans, sans-serif"
+            letterSpacing="2"
           >
             OPERATING LAYER
           </text>
         </svg>
 
-        {/* Floating stat callouts */}
         <div className="orbit-callout orbit-callout-left">
           <div className="orbit-callout-value">50+</div>
           <div className="orbit-callout-label">Native integrations</div>
@@ -272,7 +300,6 @@ export default function Integrations() {
         </div>
       </motion.div>
 
-      {/* Bottom tagline */}
       <motion.p
         className="integrations-tagline"
         initial={{ opacity: 0 }}
